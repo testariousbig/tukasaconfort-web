@@ -8,51 +8,51 @@
 
   const CRAFT_DATA = {
     mobiliario: {
-      title: 'Sofá chaise-longue verde musgo, aparador de nogal y mesa de roble',
-      desc: 'Diseñamos la distribución completa de tu salón y comedor según las medidas reales de tu vivienda, combinando maderas naturales, herrajes en negro mate y líneas minimalistas.',
+      title: 'Salón contemporáneo en roble natural y nogal',
+      desc: 'Sofá chaise-longue verde musgo, mesa de centro en roble y aparador ajustados a las dimensiones de tu hogar.',
       img: 'assets/slider-3.png',
       imgAlt: 'Sofá chaise-longue verde musgo en exposición Tu Kasa Confort',
       stageCaption: 'Estado 01 · Mobiliario minimalista (Sofá chaise-longue + aparador nogal + mesa roble)',
       callouts: [
-        'Chaise-longue verde musgo · 295 × 175 cm',
-        'Aparador en nogal y mesa de roble natural',
-        'Cuadro geométrico y cerámica de exposición'
+        'Chaise-longue verde musgo · 295 cm',
+        'Mesa orgánica en roble natural',
+        'Aparador de nogal y estantería'
       ]
     },
     tapiceria: {
-      title: 'Visillos de lino en riel de latón, puf tapizado y muestrario textil',
-      desc: 'Confeccionamos cortinas a medida, estores, paneles japoneses y alfombras. Además, renovamos y retapizamos tus sofás, sillones o sillas con telas antimanchas de alta resistencia.',
+      title: 'Tapicería textil a medida y visillos de lino',
+      desc: 'Cortinas confeccionadas con caída impecable, puf a juego y muestrario de telas antimanchas de alta resistencia.',
       img: 'assets/tapiceria-hero.png',
       imgAlt: 'Muestrario de telas y tapicería a medida en Tu Kasa Confort',
       stageCaption: 'Estado 02 · Tapicería y textil (Cortinas de lino en movimiento + puf + muestrario)',
       callouts: [
-        'Cortinas de lino natural con caída a medida',
-        'Puf tapizado y muestrario de tejidos Aquaclean',
-        'Alfombra tejida de fibra natural 300 × 200 cm'
+        'Cortinas de lino con caída a medida',
+        'Puf tapizado y telas Aquaclean',
+        'Alfombra tejida en fibra natural'
       ]
     },
     iluminacion: {
-      title: 'Lámpara suspendida de 4 esferas opalinas y luminaria de lectura en latón',
-      desc: 'Transformamos la atmósfera del salón encendiendo cada rincón con lámparas de techo esculturales, luminarias de pie regulables y luz cálida arquitectónica.',
+      title: 'Iluminación cálida ambiental y luz de lectura',
+      desc: 'Luminarias suspendidas de cristal opal y lámpara de pie en latón para equilibrar el confort visual del salón.',
       img: 'assets/iluminacion-hero.jpg',
       imgAlt: 'Iluminación decorativa cálida en Tu Kasa Confort Motril',
       stageCaption: 'Estado 03 · Iluminación escénica (Encendido cálido de esferas opalinas y lámpara de pie)',
       callouts: [
-        'Luminaria suspendida de 4 globos en cristal opal',
-        'Lámpara de pie en latón cepillado · Luz 2700K',
-        'Halos de iluminación cálida ambiental y puntual'
+        'Lámpara suspendida en cristal opal',
+        'Luminaria de pie en latón 2700K',
+        'Halos de luz cálida perimetral'
       ]
     },
     descanso: {
-      title: 'Vista explosionada: núcleo de muelles ensacados y viscoelástica de alta densidad',
-      desc: 'Elevamos los asientos en la maqueta para mostrar la ingeniería interior del confort: suspensión ergonómica, espumación técnica indeformable y equipos de descanso.',
+      title: 'Ingeniería del descanso y confort ergonómico',
+      desc: 'Suspensión de muelles ensacados, acogida viscoelástica y espumación técnica para un soporte corporal óptimo.',
       img: 'assets/descanso-card.png',
       imgAlt: 'Equipos de descanso y confort ergonómico en Tu Kasa Confort',
       stageCaption: 'Estado 04 · Ingeniería del descanso (Sección explosionada de núcleo y suspensión)',
       callouts: [
-        'Capa superior: acogida viscoelástica transpirable',
-        'Núcleo central: espuma HR de alta resiliencia',
-        'Base técnica: bloque de muelles ensacados'
+        'Acogida viscoelástica adaptable',
+        'Núcleo HR de alta resiliencia',
+        'Bloque de muelles ensacados'
       ]
     }
   };
@@ -67,44 +67,37 @@
   const callout1 = document.getElementById('callout-1');
   const callout2 = document.getElementById('callout-2');
   const callout3 = document.getElementById('callout-3');
-  const autoplayBtn = document.getElementById('hero-autoplay-toggle');
-
-  let currentCraftIndex = 0;
-  let autoplayTimer = null;
-  let isAutoplaying = true;
-
-  const activateCraft = (key, fromUser = false) => {
+  const craftTabs = document.querySelector('.hero__craft-tabs');
+  const calloutsEl = document.getElementById('iso-stage-callouts');
+  let swapTimer = 0;
+  const activateCraft = (key) => {
     const info = CRAFT_DATA[key];
     if (!info) return;
 
-    const idx = CRAFT_KEYS.indexOf(key);
-    if (idx !== -1) currentCraftIndex = idx;
-
-    // 1. Update SVG data-specialty attribute to trigger Apple-style spring CSS transitions
+    // 1. Update SVG data-specialty attribute + one-shot swap pulse
     if (svgMaquette) {
       svgMaquette.setAttribute('data-specialty', key);
+      svgMaquette.classList.remove('is-swapping');
+      void svgMaquette.getBoundingClientRect();
+      svgMaquette.classList.add('is-swapping');
     }
 
-    // 2. Update Segmented Control pills
+    // 2. Update Segmented Control pills (sliding indicator via --i)
+    if (craftTabs) craftTabs.style.setProperty('--i', CRAFT_KEYS.indexOf(key));
     craftBtns.forEach((btn) => {
       const active = btn.getAttribute('data-craft') === key;
       btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-selected', active ? 'true' : 'false');
     });
 
-    // 3. Smoothly update Callout Chips & Stage Caption
-    const calloutsWrap = document.querySelector('.iso-stage__callouts');
-    if (calloutsWrap) calloutsWrap.classList.add('is-switching');
-    if (stageCaption) stageCaption.textContent = info.stageCaption;
-
-    // 4. Smoothly transition detail panel copy + reference photo
+    // 3. Fade out panel + chips, swap copy, fade back in (title above stage stays fixed)
     if (craftPanel) craftPanel.classList.add('is-switching');
-    window.setTimeout(() => {
+    if (calloutsEl) calloutsEl.classList.add('is-switching');
+    window.clearTimeout(swapTimer);
+    swapTimer = window.setTimeout(() => {
       if (callout1 && info.callouts[0]) callout1.textContent = info.callouts[0];
       if (callout2 && info.callouts[1]) callout2.textContent = info.callouts[1];
       if (callout3 && info.callouts[2]) callout3.textContent = info.callouts[2];
-      if (calloutsWrap) calloutsWrap.classList.remove('is-switching');
-
       if (craftTitle) craftTitle.textContent = info.title;
       if (craftDesc) craftDesc.textContent = info.desc;
       if (craftImg && info.img) {
@@ -112,62 +105,37 @@
         craftImg.setAttribute('alt', info.imgAlt);
       }
       if (craftPanel) craftPanel.classList.remove('is-switching');
-    }, 150);
-
-    if (fromUser && isAutoplaying) {
-      stopAutoplay();
-    }
+      if (calloutsEl) calloutsEl.classList.remove('is-switching');
+    }, 180);
   };
 
-  const startAutoplay = () => {
-    stopAutoplay();
-    isAutoplaying = true;
-    if (autoplayBtn) {
-      autoplayBtn.textContent = 'Pausar ciclo';
-      autoplayBtn.setAttribute('aria-pressed', 'true');
-    }
-    autoplayTimer = window.setInterval(() => {
-      const nextIndex = (currentCraftIndex + 1) % CRAFT_KEYS.length;
-      activateCraft(CRAFT_KEYS[nextIndex], false);
-    }, 4800);
-  };
-
-  const stopAutoplay = () => {
-    if (autoplayTimer) {
-      window.clearInterval(autoplayTimer);
-      autoplayTimer = null;
-    }
-    isAutoplaying = false;
-    if (autoplayBtn) {
-      autoplayBtn.textContent = 'Reanudar ciclo';
-      autoplayBtn.setAttribute('aria-pressed', 'false');
-    }
-  };
+  // Subtle pointer parallax on the maquette (fine pointers only)
+  const heroVisual = document.querySelector('.hero__visual');
+  if (heroVisual && svgMaquette && window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches) {
+    let raf = 0;
+    heroVisual.addEventListener('pointermove', (e) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = heroVisual.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        svgMaquette.style.setProperty('--px', (x * 14).toFixed(1) + 'px');
+        svgMaquette.style.setProperty('--py', (y * 10).toFixed(1) + 'px');
+      });
+    });
+    heroVisual.addEventListener('pointerleave', () => {
+      svgMaquette.style.setProperty('--px', '0px');
+      svgMaquette.style.setProperty('--py', '0px');
+    });
+  }
 
   if (craftBtns.length) {
     craftBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         const key = btn.getAttribute('data-craft');
-        if (key) activateCraft(key, true);
+        if (key) activateCraft(key);
       });
-    });
-
-    // Respect prefers-reduced-motion before starting auto-cycle
-    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!prefersReducedMotion) {
-      startAutoplay();
-    } else {
-      stopAutoplay();
-    }
-  }
-
-  if (autoplayBtn) {
-    autoplayBtn.addEventListener('click', () => {
-      if (isAutoplaying) {
-        stopAutoplay();
-      } else {
-        startAutoplay();
-      }
     });
   }
 
@@ -186,8 +154,24 @@
   });
 
   /* ==========================================================================
-     2. SCROLL ENTRANCE OBSERVER
+     2. SCROLL ENTRANCE OBSERVER & NAV LINK HIGHLIGHT
      ========================================================================== */
+  const progressBar = document.getElementById('header-progress');
+  if (progressBar) {
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+          progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
   const motionNodes = document.querySelectorAll('[data-motion]');
   if ('IntersectionObserver' in window && motionNodes.length > 0) {
     const observer = new IntersectionObserver(
@@ -199,9 +183,33 @@
           }
         });
       },
-      { threshold: 0.14, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
     );
     motionNodes.forEach((node) => observer.observe(node));
+  }
+
+  const navLinks = document.querySelectorAll('.site-nav__link');
+  const trackedSections = document.querySelectorAll('section[id]');
+  if ('IntersectionObserver' in window && trackedSections.length > 0 && navLinks.length > 0) {
+    const navObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            navLinks.forEach((link) => {
+              const href = link.getAttribute('href');
+              if (href && href.endsWith(`#${id}`)) {
+                link.classList.add('is-current');
+              } else {
+                link.classList.remove('is-current');
+              }
+            });
+          }
+        });
+      },
+      { rootMargin: '-25% 0px -55% 0px' }
+    );
+    trackedSections.forEach((sec) => navObserver.observe(sec));
   }
 
   /* ==========================================================================
@@ -209,33 +217,67 @@
      ========================================================================== */
   const galleries = document.querySelectorAll('[data-gallery]');
   galleries.forEach((gallery) => {
-    const mainImg = gallery.querySelector('.project-triptych__main img');
+    const mainFig = gallery.querySelector('.project-triptych__main');
+    const mainImg = mainFig ? mainFig.querySelector('img') : null;
     const sideFigures = gallery.querySelectorAll('.project-triptych__side');
-    if (!mainImg || !sideFigures.length) return;
+    if (!mainFig || !mainImg || !sideFigures.length) return;
+
+    const projectBand = gallery.closest('.project-band');
+    const catText = projectBand ? projectBand.querySelector('.project-meta__cat') : null;
+    const scopeText = projectBand ? projectBand.querySelector('.project-meta__scope p') : null;
+    const inquiryLink = projectBand ? projectBand.querySelector('.project-meta__link') : null;
+    const projectName = projectBand ? projectBand.querySelector('.project-meta__name h3')?.textContent : '';
 
     const swapImages = (sideFig) => {
       const sideImg = sideFig.querySelector('img');
       if (!sideImg) return;
+
       const prevMainSrc = mainImg.getAttribute('src');
       const prevMainAlt = mainImg.getAttribute('alt');
+      const prevMainCat = mainFig.getAttribute('data-cat') || '';
+      const prevMainScope = mainFig.getAttribute('data-scope') || '';
+      const prevMainLabel = mainFig.getAttribute('data-label') || 'imagen';
+
+      const newMainSrc = sideImg.getAttribute('src');
       const newMainAlt = sideImg.getAttribute('alt');
+      const newMainCat = sideFig.getAttribute('data-cat') || '';
+      const newMainScope = sideFig.getAttribute('data-scope') || '';
+      const newMainLabel = sideFig.getAttribute('data-label') || 'imagen';
 
       mainImg.style.opacity = '0.35';
       sideImg.style.opacity = '0.35';
-
-      const projectBand = gallery.closest('.project-band');
-      const scopeText = projectBand ? projectBand.querySelector('.project-meta__scope p') : null;
+      if (catText) catText.style.opacity = '0.25';
       if (scopeText) scopeText.style.opacity = '0.25';
 
       window.setTimeout(() => {
-        mainImg.setAttribute('src', sideImg.getAttribute('src'));
+        // Apply new data to main figure
+        mainImg.setAttribute('src', newMainSrc);
         mainImg.setAttribute('alt', newMainAlt);
+        mainFig.setAttribute('data-cat', newMainCat);
+        mainFig.setAttribute('data-scope', newMainScope);
+        mainFig.setAttribute('data-label', newMainLabel);
+
+        // Apply previous main data to clicked side thumbnail
         sideImg.setAttribute('src', prevMainSrc);
         sideImg.setAttribute('alt', prevMainAlt);
-        if (scopeText && newMainAlt) {
-          scopeText.textContent = newMainAlt;
+        sideFig.setAttribute('data-cat', prevMainCat);
+        sideFig.setAttribute('data-scope', prevMainScope);
+        sideFig.setAttribute('data-label', prevMainLabel);
+        sideFig.setAttribute('aria-label', `Ampliar ${prevMainLabel}`);
+
+        // Update metadata text below
+        if (catText && newMainCat) {
+          catText.textContent = newMainCat;
+          catText.style.opacity = '1';
+        }
+        if (scopeText && newMainScope) {
+          scopeText.textContent = newMainScope;
           scopeText.style.opacity = '1';
         }
+        if (inquiryLink && projectName && newMainCat) {
+          inquiryLink.setAttribute('data-inquiry', `Proyecto similar a ${projectName} (${newMainCat})`);
+        }
+
         mainImg.style.opacity = '1';
         sideImg.style.opacity = '1';
       }, 140);
@@ -253,16 +295,18 @@
   });
 
   /* ==========================================================================
-     4. INQUIRY PRE-FILL INTO CONTACT FORM
+     4. DIRECT INQUIRY LINKS (MAILTO PRE-FILL)
      ========================================================================== */
   const inquiryLinks = document.querySelectorAll('[data-inquiry]');
-  const messageField = document.getElementById('f-mensaje');
   inquiryLinks.forEach((link) => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
       const topic = link.getAttribute('data-inquiry');
-      if (messageField && topic) {
-        messageField.value = `Hola equipo de Tu Kasa Confort, me gustaría recibir asesoramiento sobre: ${topic}. `;
-        window.setTimeout(() => messageField.focus(), 450);
+      if (topic) {
+        const subject = encodeURIComponent(`Consulta: ${topic}`);
+        const body = encodeURIComponent(
+          `Hola equipo de Tu Kasa Confort,\n\nMe gustaría recibir asesoramiento e información sobre: ${topic}.\n\nNombre:\nTeléfono:\nCiudad:`
+        );
+        window.location.href = `mailto:info@tukasaconfort.com?subject=${subject}&body=${body}`;
       }
     });
   });
@@ -305,34 +349,4 @@
     }
   };
   updateStoreStatus();
-
-  /* ==========================================================================
-     6. CONTACT FORM SUBMISSION HANDLER
-     ========================================================================== */
-  const contactForm = document.getElementById('tukasa-form');
-  const feedbackEl = document.getElementById('form-feedback');
-
-  if (contactForm && feedbackEl) {
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nombre = document.getElementById('f-nombre')?.value.trim() || '';
-      const apellidos = document.getElementById('f-apellidos')?.value.trim() || '';
-      const telefono = document.getElementById('f-telefono')?.value.trim() || '';
-      const email = document.getElementById('f-email')?.value.trim() || '';
-      const mensaje = document.getElementById('f-mensaje')?.value.trim() || '';
-
-      if (!nombre || !telefono || !email || !mensaje) {
-        feedbackEl.textContent = 'Por favor, completa todos los campos obligatorios para que podamos contactarte.';
-        return;
-      }
-
-      const subject = encodeURIComponent(`Consulta web Tu Kasa Confort · ${nombre} ${apellidos}`.trim());
-      const body = encodeURIComponent(
-        `Nombre: ${nombre} ${apellidos}\nTeléfono: ${telefono}\nEmail: ${email}\n\nMensaje:\n${mensaje}`
-      );
-
-      feedbackEl.textContent = `Gracias, ${nombre}. Hemos preparado tu consulta para info@tukasaconfort.com. También puedes llamarnos al 958 981 580.`;
-      window.location.href = `mailto:info@tukasaconfort.com?subject=${subject}&body=${body}`;
-    });
-  }
 })();

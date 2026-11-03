@@ -16,27 +16,53 @@ import {
   groupSvg,
   pointsAt,
   iso,
-} from "file:///C:/Users/rodri/.agents/skills/anatomy-asset/kit/iso-kit.mjs";
-import {
-  assetSvg,
-  previewHtml,
-  fitInto,
-} from "file:///C:/Users/rodri/.agents/skills/anatomy-asset/kit/asset.mjs";
+  fitProjection,
+  ISO_CSS,
+} from "file:///C:/Users/rodri/.agents/skills/anatomy/kit/iso-kit.mjs";
+
+function fitInto(points, frame, opts = {}) {
+  const pad = opts.pad ?? 16;
+  const p = fitProjection(points, frame.w, frame.h, { pad });
+  return {
+    ...p,
+    origin: [p.origin[0] + frame.x, p.origin[1] + frame.y]
+  };
+}
+
+function previewHtml({ title, svg, paper, width }) {
+  return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + title + "</title></head><body>" + svg + "</body></html>";
+}
+
+function assetSvg({ id, width, height, label, paper, theme, tint, accents, css, body }) {
+  const accentsBlock = `
+#${id}.iso{--anatomy-paper:#f5f5f3;--anatomy-face:#f9f9f9;--anatomy-top:#f9f9f9;--anatomy-shade-0:#d6d6d3;--anatomy-shade-1:#dfdfdc;--anatomy-shade-2:#e7e7e4;--anatomy-shade-3:#eeeeeb;--anatomy-lit-top:#f9f9f9;--anatomy-lit-shade:#e8e8e5;--anatomy-hi:#222225;--anatomy-mid:#858589;--anatomy-lo:#aeaeb2;--anatomy-faint:#ceced0;--anatomy-halo:#85857a;--anatomy-dot:#353539;--anatomy-card:#f5f5f3;--anatomy-page:#f5f5f3}
+#${id} .ac-moss{--anatomy-paper:#626d4c;--anatomy-face:#77825f;--anatomy-top:#7a8467;--anatomy-shade-0:#525c3b;--anatomy-shade-1:#5a6543;--anatomy-shade-2:#626d4c;--anatomy-shade-3:#6b7654;--anatomy-lit-top:#848c74;--anatomy-lit-shade:#687351;--anatomy-hi:#070b00;--anatomy-mid:#2b3318;--anatomy-lo:#475131;--anatomy-faint:#576241;--anatomy-lit:#010200;--anatomy-dot:#0a1001}
+#${id} .ac-oak{--anatomy-paper:#be9463;--anatomy-face:#d5a978;--anatomy-top:#d3ae85;--anatomy-shade-0:#ab8251;--anatomy-shade-1:#b58b5a;--anatomy-shade-2:#be9463;--anatomy-shade-3:#c89d6c;--anatomy-lit-top:#d8b997;--anatomy-lit-shade:#c59a69;--anatomy-hi:#412908;--anatomy-mid:#7a572d;--anatomy-lo:#9f7645;--anatomy-faint:#b18857;--anatomy-lit:#291702;--anatomy-dot:#472e0e}
+#${id} .ac-walnut{--anatomy-paper:#543b2a;--anatomy-face:#674e3d;--anatomy-top:#685243;--anatomy-shade-0:#432c1b;--anatomy-shade-1:#4b3323;--anatomy-shade-2:#543b2a;--anatomy-shade-3:#5c4332;--anatomy-lit-top:#6d5b4f;--anatomy-lit-shade:#59402f;--anatomy-hi:#130601;--anatomy-mid:#1b0900;--anatomy-lo:#382212;--anatomy-faint:#483120;--anatomy-lit:#050100;--anatomy-dot:#170902}
+#${id} .ac-sand{--anatomy-paper:#cec6b8;--anatomy-face:#e5ddce;--anatomy-top:#e7e0d4;--anatomy-shade-0:#bbb3a5;--anatomy-shade-1:#c5bdae;--anatomy-shade-2:#cec6b8;--anatomy-shade-3:#d8d0c1;--anatomy-lit-top:#f0eae0;--anatomy-lit-shade:#d5cdbe;--anatomy-hi:#575249;--anatomy-mid:#8c8579;--anatomy-lo:#aea798;--anatomy-faint:#c1baab;--anatomy-lit:#403d35;--anatomy-dot:#5c574e}
+#${id} .ac-linen{--anatomy-paper:#cbc7bf;--anatomy-face:#e1ded6;--anatomy-top:#e4e1da;--anatomy-shade-0:#b8b4ac;--anatomy-shade-1:#c1bdb6;--anatomy-shade-2:#cbc7bf;--anatomy-shade-3:#d4d0c9;--anatomy-lit-top:#eeebe5;--anatomy-lit-shade:#d1cdc5;--anatomy-hi:#55524e;--anatomy-mid:#89867f;--anatomy-lo:#aba7a0;--anatomy-faint:#bebab2;--anatomy-lit:#3f3d39;--anatomy-dot:#5a5853}
+#${id} .ac-terracotta{--anatomy-paper:#ae7e65;--anatomy-face:#c5937a;--anatomy-top:#c39883;--anatomy-shade-0:#9b6c54;--anatomy-shade-1:#a5755d;--anatomy-shade-2:#ae7e65;--anatomy-shade-3:#b8876e;--anatomy-lit-top:#c7a492;--anatomy-lit-shade:#b5846b;--anatomy-hi:#33180a;--anatomy-mid:#6b432f;--anatomy-lo:#8f6149;--anatomy-faint:#a2725a;--anatomy-lit:#1c0801;--anatomy-dot:#381d0e}
+#${id} .ac-brass{--anatomy-paper:#ab8543;--anatomy-face:#c29a58;--anatomy-top:#c09f68;--anatomy-shade-0:#997330;--anatomy-shade-1:#a27c39;--anatomy-shade-2:#ab8543;--anatomy-shade-3:#b58e4c;--anatomy-lit-top:#c5a97d;--anatomy-lit-shade:#b28b49;--anatomy-hi:#2e1e02;--anatomy-mid:#694905;--anatomy-lo:#8c6722;--anatomy-faint:#9f7936;--anatomy-lit:#170d00;--anatomy-dot:#342303}
+#${id} .ac-opal{--anatomy-paper:#cfc7b3;--anatomy-face:#e5dec9;--anatomy-top:#e8e1cf;--anatomy-shade-0:#bbb4a0;--anatomy-shade-1:#c5bda9;--anatomy-shade-2:#cfc7b3;--anatomy-shade-3:#d8d1bc;--anatomy-lit-top:#f0ebdc;--anatomy-lit-shade:#d5cdb9;--anatomy-hi:#575246;--anatomy-mid:#8c8675;--anatomy-lo:#afa794;--anatomy-faint:#c2baa6;--anatomy-lit:#413d33;--anatomy-dot:#5c584b}
+#${id} .ac-iron{--anatomy-paper:#262628;--anatomy-face:#38383a;--anatomy-top:#3a3a3c;--anatomy-shade-0:#18181a;--anatomy-shade-1:#1f1f21;--anatomy-shade-2:#262628;--anatomy-shade-3:#2e2e30;--anatomy-lit-top:#424244;--anatomy-lit-shade:#2b2b2d;--anatomy-hi:#09090a;--anatomy-mid:#010101;--anatomy-lo:#0f0f11;--anatomy-faint:#1d1d1f;--anatomy-lit:#020202;--anatomy-dot:#0d0d0e}
+`;
+  return `<svg data-specialty="mobiliario" xmlns="http://www.w3.org/2000/svg" id="${id}" class="iso-svg iso" data-theme="${theme}" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="${label}"><style><![CDATA[\n${ISO_CSS}\n${accentsBlock}\n${css}\n]]></style><g data-art="">${Array.isArray(body) ? body.join('') : body}</g></svg>`;
+}
 
 const W = 920;
 const H = 680;
 const PAPER = "#f5f5f3";
 
-const FLOOR = { x: -64, y: -60, w: 128, d: 120, r: 4 };
+const FLOOR = { x: -64, y: -60, w: 164, d: 124, r: 4 };
 
 const P = fitInto(
   [
-    ...boxCorners(FLOOR, 0, 78),
+    ...boxCorners(FLOOR, 0, 74),
     [-68, -64, 0],
-    [68, 64, 82],
+    [102, 66, 78],
   ],
-  { x: 24, y: 20, w: W - 48, h: H - 40 },
-  { pad: 14 }
+  { x: 20, y: 16, w: W - 40, h: H - 32 },
+  { pad: 16 }
 );
 
 const scene = [];
@@ -56,7 +82,7 @@ scene.push(
 );
 
 const floorGrid = [];
-for (let gx = -48; gx <= 48; gx += 16) {
+for (let gx = -48; gx <= 84; gx += 16) {
   floorGrid.push(lineOnTop([gx, FLOOR.y + 2], [gx, FLOOR.y + FLOOR.d - 2], 5, P));
 }
 for (let gy = -44; gy <= 44; gy += 16) {
@@ -84,7 +110,7 @@ scene.push(
 );
 
 // 1C. Back-Right Gallery Wall (x: -57..62, y: -60..-53, z: 5..68)
-const WALL_BACK = { x: -57, y: -60, w: 119, d: 7, r: 0.8 };
+const WALL_BACK = { x: -57, y: -60, w: 155, d: 7, r: 0.8 };
 scene.push(
   solidSvg(slabOf(WALL_BACK, 5, 63, P, 4, 0.4), {
     tone: "hi",
@@ -97,7 +123,7 @@ scene.push(
 );
 
 // 1D. Back-Left Architectural Window Wall (x: -64..-57, y: -53..56, z: 5..68)
-// With a minimalist black steel-framed window ("Sanación" / mobiliario-card.png reference)
+// With a minimalist black steel-framed window ("Sanaci├│n" / mobiliario-card.png reference)
 const WALL_LEFT = { x: -64, y: -53, w: 7, d: 109, r: 0.8 };
 const windowFrame = { x: -57.2, y: -38, w: 1.2, d: 68, r: 0.3 };
 scene.push(
@@ -168,7 +194,7 @@ scene.push(
 );
 
 // ============================================================================
-// 3. TAPICERÍA LAYER: SHEER LINEN CURTAINS & JAPANESE PANELS (mobiliario-1.png)
+// 3. TAPICER├ìA LAYER: SHEER LINEN CURTAINS & JAPANESE PANELS (mobiliario-1.png)
 //    (Always present as architectural drapery, animates forward in "tapiceria")
 // ============================================================================
 const curtainsGroup = [];
@@ -328,7 +354,7 @@ scene.push(
   )
 );
 
-// Top Layer: Plush Moss Bouclé Seat Cushions (Left & Center seats — lift in "descanso" mode!)
+// Top Layer: Plush Moss Boucl├® Seat Cushions (Left & Center seats ÔÇö lift in "descanso" mode!)
 const SEAT_LEFT = { x: -37.5, y: -41.5, w: 17.2, d: 22.5, r: 1.8 };
 const SEAT_MID = { x: -20.3, y: -41.5, w: 17.2, d: 22.5, r: 1.8 };
 scene.push(
@@ -432,7 +458,7 @@ scene.push(groupSvg(backCushions, { class: "iso-part iso-part--cushions" }));
 // 5. WALNUT CREDENZA & GEOMETRIC ARTWORK (mobiliario-2.png reference)
 //    Positioned on the right side of the back wall (x = 26..56, y = -53..-36)
 // ============================================================================
-const CREDENZA = { x: 27, y: -52.5, w: 30, d: 15, r: 1.5 };
+const CREDENZA = { x: 40, y: -52.5, w: 30, d: 15, r: 1.5 };
 const credenzaGroup = [
   // Framed geometric canvas mounted on the back wall above the credenza (z = 27..56)
   solidSvg(slabOf({ x: 28, y: -53, w: 28, d: 1.6, r: 0.3 }, 27, 29, P, 4), {
@@ -476,13 +502,13 @@ const credenzaGroup = [
     ].join(""),
   }),
   // Two sculptural vases on the sideboard (mobiliario-2.png)
-  solidSvg(cylinder(38.5, -45, 2.0, 21.5, 8.5, P, 22, 0.4), {
+  solidSvg(cylinder(51.5, -45, 2.0, 21.5, 8.5, P, 22, 0.4), {
     tone: "hi",
     crease: "lo",
     className: "ac-sand",
     inner: lineSvg(ring(38.5, -45, 1.1, 30.0, P, 16), { tone: "lo" }),
   }),
-  solidSvg(cylinder(44.5, -44.5, 3.2, 21.5, 4.2, P, 24, 0.8), {
+  solidSvg(cylinder(57.5, -44.5, 3.2, 21.5, 4.2, P, 24, 0.8), {
     tone: "mid",
     crease: "lo",
     className: "ac-moss",
@@ -494,7 +520,7 @@ scene.push(groupSvg(credenzaGroup, { class: "iso-part iso-part--credenza" }));
 // ============================================================================
 // 6. MINIMALIST ROUNDED OAK COFFEE TABLE (slider-3.png reference)
 //    Positioned in the foreground lounge center (x = -4..18, y = 16..32)
-//    Screen x-y = -36..+2 — 100% disjoint from pouf, sofa, and lamp!
+//    Screen x-y = -36..+2 ÔÇö 100% disjoint from pouf, sofa, and lamp!
 // ============================================================================
 const OAK_TABLE = { x: -4, y: 16, w: 22, d: 16, r: 4.0 };
 const tableLegs = [];
@@ -541,7 +567,7 @@ const tableGroup = [
 scene.push(groupSvg(tableGroup, { class: "iso-part iso-part--table" }));
 
 // ============================================================================
-// 7. TAPICERÍA FOREGROUND: OTTOMAN BENCH & TEXTILE SWATCHES (mobiliario-card.png)
+// 7. TAPICER├ìA FOREGROUND: OTTOMAN BENCH & TEXTILE SWATCHES (mobiliario-card.png)
 //    Positioned at foreground-left (x = -48..-34, y = 6..20, screen x-y = -68..-40)
 //    Zero overlap with the coffee table, floor lamp, sofa, or curtains!
 // ============================================================================
@@ -586,45 +612,53 @@ const tapiceriaExtras = [
 scene.push(groupSvg(tapiceriaExtras, { class: "iso-part iso-part--tapiceria" }));
 
 // ============================================================================
+// 8. ILUMINACI├ôN LAYER: SCULPTURAL FLOOR LAMP & SUSPENDED OPAL CHANDELIER
 // 8. ILUMINACIÓN LAYER: SCULPTURAL FLOOR LAMP & SUSPENDED OPAL CHANDELIER
-//    (iluminacion-card.png & iluminacion-hero.jpg references)
-//    Positioned at x = 40, y = 32 (z = 6.1..24.5) — 100% clear of the chaise-longue & table!
+//    Floor lamp positioned in the bottom corner (x = 84, y = 46, z = 6.1..54)
 // ============================================================================
-const LAMP_X = 40;
-const LAMP_Y = 32;
+const LAMP_X = 84;
+const LAMP_Y = 46;
 const lampGroup = [
   // Heavy brushed brass cylindrical base
-  solidSvg(cylinder(LAMP_X, LAMP_Y, 5.6, 6.1, 2.2, P, 28, 0.4), {
+  solidSvg(cylinder(LAMP_X, LAMP_Y, 5.2, 6.1, 2.4, P, 28, 0.4), {
     tone: "hi",
     crease: "lo",
     halo: true,
     className: "ac-brass",
-    inner: lineSvg(ring(LAMP_X, LAMP_Y, 3.8, 8.3, P, 22), { tone: "lo" }),
+    inner: lineSvg(ring(LAMP_X, LAMP_Y, 3.6, 8.5, P, 22), { tone: "lo" }),
   }),
-  // Slender brass stem (z = 8.3 .. 23.0)
-  solidSvg(cylinder(LAMP_X, LAMP_Y, 0.85, 8.3, 14.7, P, 16), {
+  // Tall slender brass stem (z = 8.5 .. 47.0, height 38.5)
+  solidSvg(cylinder(LAMP_X, LAMP_Y, 0.95, 8.5, 38.5, P, 16), {
     tone: "hi",
     crease: "lo",
     className: "ac-brass",
   }),
-  // Opal glass globe 1 (z = 14.5..19.3)
-  solidSvg(cylinder(LAMP_X - 3.4, LAMP_Y + 1.2, 3.2, 14.5, 4.8, P, 24, 1.4), {
+  // Lower opal glass globe (z = 26.5..32.5)
+  solidSvg(cylinder(LAMP_X - 3.2, LAMP_Y + 1.2, 3.4, 26.5, 6.0, P, 24, 1.4), {
     tone: "hi",
     crease: "lo",
     lit: true,
     className: "ac-opal",
-    inner: lineSvg(ring(LAMP_X - 3.4, LAMP_Y + 1.2, 1.5, 19.3, P, 18), { tone: "lo" }),
+    inner: lineSvg(ring(LAMP_X - 3.2, LAMP_Y + 1.2, 1.6, 32.5, P, 18), { tone: "lo" }),
   }),
-  // Opal glass globe 2 (z = 18.5..23.5)
-  solidSvg(cylinder(LAMP_X + 3.4, LAMP_Y - 1.2, 3.4, 18.5, 5.0, P, 24, 1.5), {
+  // Middle opal glass globe (z = 35.0..41.5)
+  solidSvg(cylinder(LAMP_X + 3.2, LAMP_Y - 1.2, 3.6, 35.0, 6.5, P, 24, 1.5), {
     tone: "hi",
     crease: "lo",
     lit: true,
     className: "ac-opal",
-    inner: lineSvg(ring(LAMP_X + 3.4, LAMP_Y - 1.2, 1.6, 23.5, P, 18), { tone: "lo" }),
+    inner: lineSvg(ring(LAMP_X + 3.2, LAMP_Y - 1.2, 1.7, 41.5, P, 18), { tone: "lo" }),
   }),
-  // Top brass finial
-  solidSvg(cylinder(LAMP_X, LAMP_Y, 1.4, 23.0, 1.6, P, 18, 0.3), {
+  // Upper opal glass globe (z = 43.5..50.5)
+  solidSvg(cylinder(LAMP_X - 1.4, LAMP_Y + 2.2, 3.8, 43.5, 7.0, P, 24, 1.6), {
+    tone: "hi",
+    crease: "lo",
+    lit: true,
+    className: "ac-opal",
+    inner: lineSvg(ring(LAMP_X - 1.4, LAMP_Y + 2.2, 1.8, 50.5, P, 18), { tone: "lo" }),
+  }),
+  // Top brass finial (z = 47.0..54.0)
+  solidSvg(cylinder(LAMP_X, LAMP_Y, 1.4, 47.0, 7.0, P, 18, 0.3), {
     tone: "hi",
     crease: "lo",
     className: "ac-brass",
@@ -680,17 +714,18 @@ const chandelierGroup = [
   }),
 ];
 
-// Warm ambient light bloom circles for "iluminacion" mode
+// Warm ambient light bloom circles always on
 const glowCenters = [
-  [LAMP_X - 3.4, LAMP_Y + 1.2, 17, 26],
-  [LAMP_X + 3.4, LAMP_Y - 1.2, 21, 28],
-  [-26, -32, 62, 30],
-  [-12, -36, 66, 26],
-  [0, -28, 61, 32],
-  [12, -32, 63, 28],
+  [LAMP_X - 3.2, LAMP_Y + 1.2, 29.5, 30],
+  [LAMP_X + 3.2, LAMP_Y - 1.2, 38.0, 32],
+  [LAMP_X - 1.4, LAMP_Y + 2.2, 47.0, 34],
+  [-26, -32, 62, 32],
+  [-12, -36, 66, 28],
+  [0, -28, 61, 34],
+  [12, -32, 63, 30],
 ].map(([gx, gy, gz, gr]) => {
   const [sx, sy] = iso([gx, gy, gz], P);
-  return `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${gr}" fill="#f5d07a" fill-opacity="0.28"/><circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(gr * 1.55).toFixed(1)}" fill="#f5d07a" fill-opacity="0.12"/>`;
+  return `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${gr}" fill="#ffd772" fill-opacity="0.32" filter="blur(6px)"/><circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${(gr * 1.55).toFixed(1)}" fill="#ffbe3d" fill-opacity="0.14" filter="blur(12px)"/>`;
 });
 
 scene.push(
@@ -706,142 +741,26 @@ scene.push(
 
 const INTERACTIVE_STAGE_CSS = `
 #tukasa-atelier-iso .iso-part {
-  transition:
-    transform 720ms cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 540ms cubic-bezier(0.32, 0.72, 0, 1),
-    filter 540ms cubic-bezier(0.32, 0.72, 0, 1);
-  transform-box: fill-box;
-  transform-origin: center center;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+#tukasa-atelier-iso .iso-part--descanso-visco,
+#tukasa-atelier-iso .iso-part--descanso-springs {
+  display: none !important;
 }
 #tukasa-atelier-iso .iso-light-bloom {
-  opacity: 0;
-  transition: opacity 540ms cubic-bezier(0.32, 0.72, 0, 1);
+  opacity: 1 !important;
   pointer-events: none;
 }
-
-/* 1. MOBILIARIO: Sofa chaise-longue, oak coffee table & walnut sideboard + art stand out vividly; textiles & lamps recede */
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--sofa-base,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--sofa-frame,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--sofa-arm-l,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--chaise,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--descanso-top,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--cushions {
-  opacity: 1;
-  filter: saturate(1.18);
-  transform: translateY(-4px);
-}
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--table {
-  opacity: 1;
-  filter: saturate(1.22);
-  transform: translateY(-7px) scale(1.04);
-}
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--credenza {
-  opacity: 1;
-  filter: saturate(1.22);
-  transform: translateY(-7px) scale(1.04);
-}
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--tapiceria,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--curtains,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--iluminacion,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--rug,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--descanso-visco,
-#tukasa-atelier-iso[data-specialty="mobiliario"] .iso-part--descanso-springs {
-  opacity: 0.24;
-  filter: saturate(0.25);
-}
-
-/* 2. TAPICERÍA: Curtains, upholstered pouf + swatch deck, woven rug & throw cushions pop; wood furniture & lamps fade */
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--curtains {
-  opacity: 1;
-  filter: saturate(1.25);
-  transform: translate(10px, 5px) scale(1.03);
-}
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--tapiceria {
-  opacity: 1;
-  filter: saturate(1.28);
-  transform: translate(4px, -10px) scale(1.07);
-}
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--rug {
-  opacity: 1;
-  filter: saturate(1.22);
-}
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--cushions {
-  opacity: 1;
-  filter: saturate(1.25);
-  transform: translateY(-10px) scale(1.05);
-}
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--credenza,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--iluminacion,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--table,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--sofa-base,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--sofa-frame,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--sofa-arm-l,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--descanso-top,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--descanso-visco,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--descanso-springs,
-#tukasa-atelier-iso[data-specialty="tapiceria"] .iso-part--chaise {
-  opacity: 0.14;
-  filter: saturate(0.12);
-}
-
-/* 3. ILUMINACIÓN: Chandelier & brass floor lamp shine with golden halos; all furniture & textiles dim strongly */
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--iluminacion {
-  transform: translateY(8px) scale(1.05);
-  opacity: 1;
-  filter: saturate(1.3);
-}
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-light-bloom {
-  opacity: 1;
-}
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--sofa-base,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--sofa-frame,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--sofa-arm-l,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--descanso-top,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--descanso-visco,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--descanso-springs,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--chaise,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--cushions,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--table,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--credenza,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--tapiceria,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--curtains,
-#tukasa-atelier-iso[data-specialty="iluminacion"] .iso-part--rug {
-  opacity: 0.14;
-  filter: saturate(0.12);
-}
-
-/* 4. DESCANSO: 3D Exploded Cutaway of the Pocket-Spring & Viscoelastic Core stands out; everything else fades out */
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--descanso-top {
-  opacity: 1;
-  filter: saturate(1.25);
-  transform: translateY(-56px) scale(1.03);
-}
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--descanso-visco {
-  opacity: 1;
-  filter: saturate(1.3);
-  transform: translateY(-28px) scale(1.03);
-}
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--descanso-springs {
-  opacity: 1;
-  filter: saturate(1.3);
-  transform: scale(1.03);
-}
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--sofa-base,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--chaise {
-  opacity: 0.85;
-}
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--sofa-frame,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--sofa-arm-l,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--cushions,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--table,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--tapiceria,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--iluminacion,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--credenza,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--curtains,
-#tukasa-atelier-iso[data-specialty="descanso"] .iso-part--rug {
-  opacity: 0.13;
-  filter: saturate(0.1);
-  transform: translateY(4px);
+#tukasa-atelier-iso .ac-opal {
+  --anatomy-paper: #fff6d9;
+  --anatomy-face: #ffffff;
+  --anatomy-top: #ffffff;
+  --anatomy-lit-top: #ffffff;
+  --anatomy-lit-shade: #fffaea;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 110, 0.55));
 }
 `;
 
@@ -850,7 +769,7 @@ const rawSvg = assetSvg({
   width: W,
   height: H,
   label:
-    "Salón minimalista isométrico de Tu Kasa Confort: sofá chaise-longue verde musgo, mesa de roble, aparador de nogal, cortinas de lino e iluminación opal",
+    "Sal├│n minimalista isom├®trico de Tu Kasa Confort: sof├í chaise-longue verde musgo, mesa de roble, aparador de nogal, cortinas de lino e iluminaci├│n opal",
   paper: PAPER,
   theme: "light",
   tint: 0.35,
@@ -885,7 +804,7 @@ writeFileSync("assets/hero-atelier.svg", svg);
 writeFileSync(
   ".taste-skill/hero-preview.html",
   previewHtml({
-    title: "Tu Kasa Confort · Salón Minimalista Isométrico",
+    title: "Tu Kasa Confort ┬À Sal├│n Minimalista Isom├®trico",
     svg,
     paper: PAPER,
     width: W,
