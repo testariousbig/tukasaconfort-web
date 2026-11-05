@@ -11,9 +11,9 @@
   --accent-strong: #3d4831;
   --accent-ink: #ffffff;
 
-  /* Typography: Century Gothic (Brand Official) with geometric fallbacks */
-  --font-display: "Century Gothic", CenturyGothic, AppleGothic, "Jost", sans-serif;
-  --font-text: "Century Gothic", CenturyGothic, AppleGothic, "Jost", sans-serif;
+  /* Typography: Bodoni Moda / Jost */
+  --font-display: "Bodoni Moda", Georgia, serif;
+  --font-text: "Jost", "Helvetica Neue", Arial, sans-serif;
 
   /* Five type steps only */
   --step-small: clamp(0.875rem, 0.84rem + 0.1vw, 0.9375rem);     /* 14–15px */
@@ -125,10 +125,10 @@ h2,
 h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 500;
   font-optical-sizing: auto;
-  letter-spacing: -0.015em;
-  line-height: 1.12;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
   text-wrap: balance;
   hyphens: none;
   color: var(--ink);
@@ -136,16 +136,16 @@ h3 {
 
 .display {
   font-size: var(--step-display);
-  line-height: 1.06;
+  line-height: 0.98;
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .head {
   font-size: var(--step-head);
-  line-height: 1.12;
-  letter-spacing: -0.015em;
-  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  font-weight: 500;
 }
 
 .lead {
@@ -361,9 +361,10 @@ h3 {
 .hero__proof-val {
   font-family: var(--font-display);
   font-size: clamp(1.45rem, 2.1vw, 1.95rem);
-  font-weight: 700;
+  font-weight: 500;
   color: var(--ink);
   line-height: 1;
+  letter-spacing: 0.03em;
 }
 
 .hero__proof-txt {
@@ -464,7 +465,7 @@ h3 {
 .manifesto__quote {
   margin-top: 1.5rem;
   font-family: var(--font-display);
-  font-style: normal;
+  font-style: italic;
   font-weight: 500;
   font-size: var(--step-lead);
   line-height: 1.38;
@@ -917,7 +918,7 @@ h3 {
   font-size: clamp(0.98rem, 1.1vw, 1.12rem);
   line-height: 1.45;
   color: var(--ink);
-  font-style: normal;
+  font-style: italic;
   font-weight: 500;
   border-left: 2px solid var(--accent);
   padding-left: 0.95rem;
@@ -1846,8 +1847,8 @@ h3 {
 @media (max-width: 700px) {
   :root {
     --margin: 1.25rem;
-    --step-display: clamp(1.8rem, 7.8vw, 2.6rem);
-    --step-head: clamp(1.6rem, 6.8vw, 2.2rem);
+    --step-display: clamp(2.1rem, 8.8vw, 2.75rem);
+    --step-head: clamp(1.75rem, 7.2vw, 2.35rem);
   }
 
   .hero__proof {
