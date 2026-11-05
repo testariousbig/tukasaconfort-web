@@ -962,7 +962,7 @@ h3 {
 }
 
 @keyframes project-drift {
-  from { scale: 1.14; }
+  from { scale: 1.03; }
   to { scale: 1; }
 }
 
