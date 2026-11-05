@@ -2,115 +2,65 @@
   'use strict';
 
   /* ==========================================================================
-     1. APPLE-STYLE INTERACTIVE 4-SPECIALTY MAQUETTE CONTROLLER
+     1. ARCHITECTURAL PARALLAX SCROLLING & MAQUETTE POINTER DEPTH
      ========================================================================== */
-  const CRAFT_KEYS = ['mobiliario', 'tapiceria', 'iluminacion', 'descanso'];
+  const initParallax = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const CRAFT_DATA = {
-    mobiliario: {
-      title: 'Salón contemporáneo en roble natural y nogal',
-      desc: 'Sofá chaise-longue verde musgo, mesa de centro en roble y aparador ajustados a las dimensiones de tu hogar.',
-      img: 'assets/slider-3.png',
-      imgAlt: 'Sofá chaise-longue verde musgo en exposición Tu Kasa Confort',
-      stageCaption: 'Estado 01 · Mobiliario minimalista (Sofá chaise-longue + aparador nogal + mesa roble)',
-      callouts: [
-        'Chaise-longue verde musgo · 295 cm',
-        'Mesa orgánica en roble natural',
-        'Aparador de nogal y estantería'
-      ]
-    },
-    tapiceria: {
-      title: 'Tapicería textil a medida y visillos de lino',
-      desc: 'Cortinas confeccionadas con caída impecable, puf a juego y muestrario de telas antimanchas de alta resistencia.',
-      img: 'assets/tapiceria-hero.png',
-      imgAlt: 'Muestrario de telas y tapicería a medida en Tu Kasa Confort',
-      stageCaption: 'Estado 02 · Tapicería y textil (Cortinas de lino en movimiento + puf + muestrario)',
-      callouts: [
-        'Cortinas de lino con caída a medida',
-        'Puf tapizado y telas Aquaclean',
-        'Alfombra tejida en fibra natural'
-      ]
-    },
-    iluminacion: {
-      title: 'Iluminación cálida ambiental y luz de lectura',
-      desc: 'Luminarias suspendidas de cristal opal y lámpara de pie en latón para equilibrar el confort visual del salón.',
-      img: 'assets/iluminacion-hero.jpg',
-      imgAlt: 'Iluminación decorativa cálida en Tu Kasa Confort Motril',
-      stageCaption: 'Estado 03 · Iluminación escénica (Encendido cálido de esferas opalinas y lámpara de pie)',
-      callouts: [
-        'Lámpara suspendida en cristal opal',
-        'Luminaria de pie en latón 2700K',
-        'Halos de luz cálida perimetral'
-      ]
-    },
-    descanso: {
-      title: 'Ingeniería del descanso y confort ergonómico',
-      desc: 'Suspensión de muelles ensacados, acogida viscoelástica y espumación técnica para un soporte corporal óptimo.',
-      img: 'assets/descanso-card.png',
-      imgAlt: 'Equipos de descanso y confort ergonómico en Tu Kasa Confort',
-      stageCaption: 'Estado 04 · Ingeniería del descanso (Sección explosionada de núcleo y suspensión)',
-      callouts: [
-        'Acogida viscoelástica adaptable',
-        'Núcleo HR de alta resiliencia',
-        'Bloque de muelles ensacados'
-      ]
-    }
-  };
+    const heroVisual = document.querySelector('.hero__visual');
+    const parallaxImgs = document.querySelectorAll('[data-parallax-img]');
+    if (!heroVisual && !parallaxImgs.length) return;
 
-  const svgMaquette = document.getElementById('tukasa-atelier-iso');
-  const craftBtns = document.querySelectorAll('.hero__craft-btn[data-craft]');
-  const craftPanel = document.getElementById('hero-craft-panel');
-  const craftTitle = document.getElementById('hero-craft-title');
-  const craftDesc = document.getElementById('hero-craft-desc');
-  const craftImg = document.getElementById('hero-craft-img');
-  const stageCaption = document.getElementById('iso-stage-caption');
-  const callout1 = document.getElementById('callout-1');
-  const callout2 = document.getElementById('callout-2');
-  const callout3 = document.getElementById('callout-3');
-  const craftTabs = document.querySelector('.hero__craft-tabs');
-  const calloutsEl = document.getElementById('iso-stage-callouts');
-  let swapTimer = 0;
-  const activateCraft = (key) => {
-    const info = CRAFT_DATA[key];
-    if (!info) return;
+    let ticking = false;
 
-    // 1. Update SVG data-specialty attribute + one-shot swap pulse
-    if (svgMaquette) {
-      svgMaquette.setAttribute('data-specialty', key);
-      svgMaquette.classList.remove('is-swapping');
-      void svgMaquette.getBoundingClientRect();
-      svgMaquette.classList.add('is-swapping');
-    }
+    const updateParallax = () => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
 
-    // 2. Update Segmented Control pills (sliding indicator via --i)
-    if (craftTabs) craftTabs.style.setProperty('--i', CRAFT_KEYS.indexOf(key));
-    craftBtns.forEach((btn) => {
-      const active = btn.getAttribute('data-craft') === key;
-      btn.classList.toggle('is-active', active);
-      btn.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-
-    // 3. Fade out panel + chips, swap copy, fade back in (title above stage stays fixed)
-    if (craftPanel) craftPanel.classList.add('is-switching');
-    if (calloutsEl) calloutsEl.classList.add('is-switching');
-    window.clearTimeout(swapTimer);
-    swapTimer = window.setTimeout(() => {
-      if (callout1 && info.callouts[0]) callout1.textContent = info.callouts[0];
-      if (callout2 && info.callouts[1]) callout2.textContent = info.callouts[1];
-      if (callout3 && info.callouts[2]) callout3.textContent = info.callouts[2];
-      if (craftTitle) craftTitle.textContent = info.title;
-      if (craftDesc) craftDesc.textContent = info.desc;
-      if (craftImg && info.img) {
-        craftImg.setAttribute('src', info.img);
-        craftImg.setAttribute('alt', info.imgAlt);
+      // 1. Hero 3D maquette stage depth lag
+      if (heroVisual && scrollY < vh * 1.3) {
+        const heroOffset = (scrollY * 0.12).toFixed(1);
+        heroVisual.style.transform = `translate3d(0, ${heroOffset}px, 0)`;
       }
-      if (craftPanel) craftPanel.classList.remove('is-switching');
-      if (calloutsEl) calloutsEl.classList.remove('is-switching');
-    }, 180);
+
+      // 2. Contained media cards parallax shift
+      parallaxImgs.forEach((img) => {
+        const parent = img.parentElement;
+        if (!parent) return;
+        const rect = parent.getBoundingClientRect();
+        if (rect.bottom > -40 && rect.top < vh + 40) {
+          // Normalized distance from viewport center: -1 (top) to +1 (bottom)
+          const centerNorm = (rect.top + rect.height * 0.5 - vh * 0.5) / (vh * 0.5);
+          const shift = (centerNorm * -22).toFixed(1);
+          img.style.setProperty('--parallax-shift', `${shift}px`);
+        }
+      });
+
+      ticking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    updateParallax();
   };
 
-  // Subtle pointer parallax on the maquette (fine pointers only)
+  initParallax();
+
+  // Subtle pointer depth on the maquette (desktop fine pointers only)
   const heroVisual = document.querySelector('.hero__visual');
+  const svgMaquette = document.getElementById('tukasa-atelier-iso');
   if (heroVisual && svgMaquette && window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches) {
     let raf = 0;
     heroVisual.addEventListener('pointermove', (e) => {
@@ -120,8 +70,8 @@
         const r = heroVisual.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width - 0.5;
         const y = (e.clientY - r.top) / r.height - 0.5;
-        svgMaquette.style.setProperty('--px', (x * 14).toFixed(1) + 'px');
-        svgMaquette.style.setProperty('--py', (y * 10).toFixed(1) + 'px');
+        svgMaquette.style.setProperty('--px', (x * 12).toFixed(1) + 'px');
+        svgMaquette.style.setProperty('--py', (y * 8).toFixed(1) + 'px');
       });
     });
     heroVisual.addEventListener('pointerleave', () => {
@@ -129,29 +79,6 @@
       svgMaquette.style.setProperty('--py', '0px');
     });
   }
-
-  if (craftBtns.length) {
-    craftBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const key = btn.getAttribute('data-craft');
-        if (key) activateCraft(key);
-      });
-    });
-  }
-
-  // Bento card "Ver en maqueta 3D" triggers
-  const bentoTriggers = document.querySelectorAll('[data-trigger-craft]');
-  bentoTriggers.forEach((trigger) => {
-    trigger.addEventListener('click', () => {
-      const key = trigger.getAttribute('data-trigger-craft');
-      if (!key) return;
-      activateCraft(key, true);
-      const heroStage = document.getElementById('tukasa-atelier-iso');
-      if (heroStage) {
-        heroStage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    });
-  });
 
   /* ==========================================================================
      2. SCROLL ENTRANCE OBSERVER & NAV LINK HIGHLIGHT
