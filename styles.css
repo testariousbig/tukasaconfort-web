@@ -125,7 +125,7 @@ h2,
 h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 600;
   font-optical-sizing: auto;
   letter-spacing: -0.02em;
   line-height: 0.98;
@@ -138,14 +138,14 @@ h3 {
   font-size: var(--step-display);
   line-height: 0.98;
   letter-spacing: -0.02em;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .head {
   font-size: var(--step-head);
   line-height: 1.02;
   letter-spacing: -0.02em;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .lead {
@@ -361,7 +361,7 @@ h3 {
 .hero__proof-val {
   font-family: var(--font-display);
   font-size: clamp(1.45rem, 2.1vw, 1.95rem);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
   line-height: 1;
   letter-spacing: 0.03em;
@@ -466,7 +466,7 @@ h3 {
   margin-top: 1.5rem;
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
   font-size: var(--step-lead);
   line-height: 1.38;
   max-width: 34ch;
@@ -919,7 +919,7 @@ h3 {
   line-height: 1.45;
   color: var(--ink);
   font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
   border-left: 2px solid var(--accent);
   padding-left: 0.95rem;
   margin: 0;
