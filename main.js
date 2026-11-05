@@ -238,42 +238,4 @@
     });
   });
 
-  /* ==========================================================================
-     5. MOTRIL SHOWROOM LIVE STATUS (L-V 10:00-13:30 / 17:00-20:30, Sáb 10:00-13:30)
-     ========================================================================== */
-  const statusEl = document.getElementById('store-status-line');
-
-  const updateStoreStatus = () => {
-    try {
-      const now = new Date();
-      const parts = new Intl.DateTimeFormat('es-ES', {
-        timeZone: 'Europe/Madrid',
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }).formatToParts(now);
-
-      const map = {};
-      parts.forEach((p) => { map[p.type] = p.value; });
-      const hour = parseInt(map.hour || '12', 10);
-      const minute = parseInt(map.minute || '0', 10);
-      const mins = hour * 60 + minute;
-      const dayStr = (map.weekday || '').toLowerCase();
-
-      const isSunday = dayStr.startsWith('dom');
-      const isSaturday = dayStr.startsWith('sáb') || dayStr.startsWith('sab');
-      const morningOpen = mins >= 10 * 60 && mins < 13 * 60 + 30;
-      const eveningOpen = !isSaturday && !isSunday && mins >= 17 * 60 && mins < 20 * 60 + 30;
-
-      if (!isSunday && (morningOpen || eveningOpen)) {
-        if (statusEl) statusEl.textContent = 'Showroom abierto ahora en Motril · Te esperamos';
-      } else {
-        if (statusEl) statusEl.textContent = 'Tienda en Motril · Abierto L–V (10:00–13:30 y 17:00–20:30) y Sáb (10:00–13:30)';
-      }
-    } catch {
-      // Keep default text on fallback
-    }
-  };
-  updateStoreStatus();
 })();

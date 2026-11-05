@@ -126,9 +126,10 @@ h3 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  font-optical-sizing: auto;
+  font-variation-settings: 'wght' 600, 'opsz' 16;
+  font-optical-sizing: none;
   letter-spacing: -0.02em;
-  line-height: 0.98;
+  line-height: 1.04;
   text-wrap: balance;
   hyphens: none;
   color: var(--ink);
@@ -136,16 +137,18 @@ h3 {
 
 .display {
   font-size: var(--step-display);
-  line-height: 0.98;
+  line-height: 1.04;
   letter-spacing: -0.02em;
   font-weight: 600;
+  font-variation-settings: 'wght' 600, 'opsz' 16;
 }
 
 .head {
   font-size: var(--step-head);
-  line-height: 1.02;
+  line-height: 1.06;
   letter-spacing: -0.02em;
   font-weight: 600;
+  font-variation-settings: 'wght' 600, 'opsz' 16;
 }
 
 .lead {
@@ -362,6 +365,8 @@ h3 {
   font-family: var(--font-display);
   font-size: clamp(1.45rem, 2.1vw, 1.95rem);
   font-weight: 600;
+  font-variation-settings: 'wght' 600, 'opsz' 16;
+  font-optical-sizing: none;
   color: var(--ink);
   line-height: 1;
   letter-spacing: 0.03em;
@@ -1321,12 +1326,6 @@ h3 {
   color: var(--ink);
 }
 
-.visit-card__status {
-  font-size: var(--step-body);
-  color: var(--accent);
-  font-weight: 500;
-}
-
 .visit-card__hours {
   display: flex;
   flex-direction: column;
@@ -1566,6 +1565,8 @@ h3 {
 
 .lines [data-line] {
   display: block;
+  font-weight: inherit;
+  font-variation-settings: inherit;
 }
 
 @media (prefers-reduced-motion: no-preference) {
