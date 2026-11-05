@@ -816,8 +816,8 @@ h3 {
 
 .project-info__thumbs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
 }
 
 .project-triptych__side {
@@ -825,25 +825,25 @@ h3 {
   aspect-ratio: 4 / 3;
   min-width: 0;
   overflow: hidden;
-  border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background-color: var(--surface);
   cursor: pointer;
-  transition: transform var(--t-press) var(--ease-spring), box-shadow var(--t-hover) ease;
+  transition: transform var(--t-press) var(--ease-spring), box-shadow var(--t-hover) ease, border-color var(--t-hover) ease;
 }
 
 .project-triptych__side::after {
-  content: "Ampliar";
+  content: "Ver";
   position: absolute;
-  inset: auto 0.5rem 0.5rem auto;
-  padding: 0.2rem 0.6rem;
+  inset: auto 0.4rem 0.4rem auto;
+  padding: 0.15rem 0.45rem;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--ink);
-  font-size: var(--step-small);
+  font-size: 0.72rem;
   font-weight: 500;
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(4px);
   transition: opacity var(--t-hover) ease, transform var(--t-hover) var(--ease-out);
   pointer-events: none;
 }
